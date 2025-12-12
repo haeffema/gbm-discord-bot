@@ -1,20 +1,24 @@
 import fetch from "node-fetch";
 import FormData from "form-data";
 
-export async function updateInteraction(applicationId, token, content, fileBuffer = null, fileName = "video.mp4") {
+export async function updateInteraction(applicationId, token, content, fileBuffer = null, fileName = "video.mp4", embeds = null) {
   const url = `https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`;
 
   let body;
   const headers = {};
 
+  const payload = {};
+  if (content) payload.content = content;
+  if (embeds) payload.embeds = embeds;
+
   if (fileBuffer) {
     const form = new FormData();
-    form.append("payload_json", JSON.stringify({ content }));
+    form.append("payload_json", JSON.stringify(payload));
     form.append("files[0]", fileBuffer, fileName);
     body = form;
     Object.assign(headers, form.getHeaders());
   } else {
-    body = JSON.stringify({ content });
+    body = JSON.stringify(payload);
     headers["Content-Type"] = "application/json";
   }
 

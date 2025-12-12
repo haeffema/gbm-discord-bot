@@ -67,6 +67,76 @@ const commands = [
   {
     name: "code",
     description: "Get the bot's source code link",
+  },
+  {
+    name: "add-league-account",
+    description: "Link a League of Legends account",
+    options: [
+      {
+        name: "game-name",
+        description: "Your Riot Game Name",
+        type: 3,
+        required: true
+      },
+      {
+        name: "tag-line",
+        description: "Your Riot Tag Line",
+        type: 3,
+        required: true
+      },
+      {
+        name: "user",
+        description: "User to link account for (optional)",
+        type: 6,
+        required: false
+      }
+    ]
+  },
+
+  {
+    name: "ranked",
+    description: "Get Ranked Solo/Duo stats",
+    options: [
+      {
+        name: "user",
+        description: "User to get stats for (optional)",
+        type: 6,
+        required: false
+      }
+    ]
+  },
+  {
+    name: "flex",
+    description: "Get Ranked Flex stats",
+    options: [
+      {
+        name: "user",
+        description: "User to get stats for (optional)",
+        type: 6,
+        required: false
+      }
+    ]
+  },
+
+  {
+    name: "remove-league-account",
+    description: "Unlink a League of Legends account",
+    options: [
+      {
+        name: "user",
+        description: "User to unlink account for (optional)",
+        type: 6,
+        required: false
+      }
+    ]
+  },
+  {
+    name: "ranked-race",
+    description: "Show ranked leaderboard for all registered members"
+  },
+  {
+    name: "flex-race",
+    description: "Show flex leaderboard for all registered members"
   }
 ];
 
