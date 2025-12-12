@@ -9,6 +9,60 @@ const commands = [
   {
     name: "ping",
     description: "Test command"
+  },
+  {
+    name: "download",
+    description: "Download a TikTok video",
+    options: [
+      {
+        name: "url",
+        description: "TikTok video URL",
+        type: 3,
+        required: true
+      }
+    ]
+  },
+  {
+    name: "set-birthday",
+    description: "Set your birthday",
+    options: [
+      {
+        name: "day",
+        description: "Day (1-31)",
+        type: 4, // INTEGER
+        required: true
+      },
+      {
+        name: "month",
+        description: "Month (1-12)",
+        type: 4, // INTEGER
+        required: true
+      },
+      {
+        name: "year",
+        description: "Year (e.g. 1990)",
+        type: 4, // INTEGER
+        required: true
+      },
+      {
+        name: "user",
+        description: "User to set birthday for (optional)",
+        type: 6, // USER
+        required: false
+      }
+    ]
+  },
+  {
+    name: "remove-birthday",
+    description: "Remove your birthday",
+    options: [
+      {
+        name: "user",
+        description: "User to remove birthday for (optional)",
+        type: 6, // USER
+        required: false
+      }
+    ]
   }
 ];
 
