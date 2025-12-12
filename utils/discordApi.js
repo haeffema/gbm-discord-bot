@@ -12,8 +12,6 @@ export async function updateInteraction(applicationId, token, content, fileBuffe
     form.append("payload_json", JSON.stringify({ content }));
     form.append("files[0]", fileBuffer, fileName);
     body = form;
-    // form-data headers need to be merged with any others? 
-    // fetch accepts form as body and handles headers if we pass form.getHeaders().
     Object.assign(headers, form.getHeaders());
   } else {
     body = JSON.stringify({ content });

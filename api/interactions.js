@@ -1,5 +1,4 @@
 import nacl from "tweetnacl";
-import { downloadTikTokVideo } from "../utils/tiktokDownloader.js";
 
 const PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
 
@@ -86,7 +85,6 @@ export default async function handler(req, res) {
                return;
             }
     
-            // Just send file, no content message
             await updateInteraction(applicationId, token, "", videoBuffer, "tiktok.mp4");
     
         } catch (err) {
@@ -99,17 +97,14 @@ export default async function handler(req, res) {
     }
 
     if (command === "set-birthday") {
-        // Extract options
         const options = data.data.options || [];
         const day = options.find(o => o.name === "day")?.value;
         const month = options.find(o => o.name === "month")?.value;
         const year = options.find(o => o.name === "year")?.value;
         const targetUserId = options.find(o => o.name === "user")?.value;
         
-        // Determine target user
         const userId = targetUserId || data.member?.user?.id || data.user?.id;
         
-        // Validation
         const currentYear = new Date().getFullYear();
         if (!day || !month || !year || 
             day < 1 || day > 31 || 
@@ -159,6 +154,13 @@ export default async function handler(req, res) {
              }
         })());
         return;
+    }
+
+    if (command === "code") {
+      return res.status(200).json({
+        type: 4,
+        data: { content: "https://github.com/haeffema/gbm-discord-bot" },
+      });
     }
 
     return res.status(200).json({

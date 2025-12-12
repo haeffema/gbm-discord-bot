@@ -29,25 +29,25 @@ const commands = [
       {
         name: "day",
         description: "Day (1-31)",
-        type: 4, // INTEGER
+        type: 4,
         required: true
       },
       {
         name: "month",
         description: "Month (1-12)",
-        type: 4, // INTEGER
+        type: 4,
         required: true
       },
       {
         name: "year",
         description: "Year (e.g. 1990)",
-        type: 4, // INTEGER
+        type: 4,
         required: true
       },
       {
         name: "user",
         description: "User to set birthday for (optional)",
-        type: 6, // USER
+        type: 6,
         required: false
       }
     ]
@@ -59,10 +59,14 @@ const commands = [
       {
         name: "user",
         description: "User to remove birthday for (optional)",
-        type: 6, // USER
+        type: 6,
         required: false
       }
     ]
+  },
+  {
+    name: "code",
+    description: "Get the bot's source code link",
   }
 ];
 

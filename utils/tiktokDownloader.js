@@ -38,17 +38,11 @@ export async function downloadTikTokVideo(url) {
       
       if (!videoUrl) continue;
 
-      // Check size before downloading completely if possible
       const headRes = await fetch(videoUrl, { method: "HEAD" });
       if (headRes.ok) {
         const size = parseInt(headRes.headers.get("content-length") || "0", 10);
         if (size > 8 * 1024 * 1024) {
              console.log(`Video too large: ${size} bytes`);
-             // We can return null here to let the main handler deal with "too large" message locally 
-             // OR we could return a special object. 
-             // For now, let's just let it download and fail in the main loop or (optimization) return null to signal "too large/fail" immediately?
-             // The original code checked buffer size.
-             // Let's download it. Vercel memory limit might be tight, but 8MB is fine.
         }
       }
 
