@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       if (!url || !url.includes("tiktok.com")) {
         return res.status(200).json({
           type: 4,
-          data: { content: "Please provide a valid TikTok URL." },
+          data: { content: "Diese URL wird noch nicht unterstützt." },
         });
       }
 
@@ -71,17 +71,12 @@ export default async function handler(req, res) {
 
       waitUntil((async () => {
         try {
-            await updateInteraction(applicationId, token, "searching video...");
+            await updateInteraction(applicationId, token, "");
             
             const videoBuffer = await downloadTikTokVideo(url);
     
             if (!videoBuffer) {
-               await updateInteraction(applicationId, token, `could not download video: ${url}`);
-               return;
-            }
-    
-            if (videoBuffer.length > 8 * 1024 * 1024) {
-               await updateInteraction(applicationId, token, "file to big");
+               await updateInteraction(applicationId, token, `Kein Video gefunden: ${url}`);
                return;
             }
     
@@ -89,7 +84,7 @@ export default async function handler(req, res) {
     
         } catch (err) {
             console.error(err);
-            await updateInteraction(applicationId, token, `${err.message}`);
+            await updateInteraction(applicationId, token, `Fehler: ${err.message}`);
         }
       })());
       
@@ -112,11 +107,11 @@ export default async function handler(req, res) {
             year < 1900 || year > currentYear) {
              return res.status(200).json({
                 type: 4,
-                data: { content: "Invalid date. Please check day (1-31), month (1-12), and year." },
+                data: { content: "Kein valides Datum." },
              });
         }
 
-        res.status(200).json({ type: 5 }); // Defer
+        res.status(200).json({ type: 5 });
         const { waitUntil } = await import("@vercel/functions");
         const { updateInteraction } = await import("../utils/discordApi.js");
         const { setBirthday } = await import("../utils/db.js");
@@ -124,9 +119,9 @@ export default async function handler(req, res) {
         waitUntil((async () => {
              try {
                  await setBirthday(userId, day, month, year);
-                 await updateInteraction(applicationId, token, `Birthday set for <@${userId}> to ${day}.${month}.${year}!`);
+                 await updateInteraction(applicationId, token, `Geburtstag für <@${userId}> am ${day}.${month}.${year} eingetragen!`);
              } catch (e) {
-                 await updateInteraction(applicationId, token, `Error: ${e.message}`);
+                 await updateInteraction(applicationId, token, `Fehler: ${e.message}`);
              }
         })());
         return;
@@ -145,12 +140,12 @@ export default async function handler(req, res) {
              try {
                  await removeBirthday(userId);
                  if (targetUserId) {
-                     await updateInteraction(applicationId, token, `Removed birthday for <@${userId}>.`);
+                     await updateInteraction(applicationId, token, `Geburtstag von <@${userId}> entfernt.`);
                  } else {
-                     await updateInteraction(applicationId, token, `Birthday removed.`);
+                     await updateInteraction(applicationId, token, `Geburtstag entfernt.`);
                  }
              } catch (e) {
-                 await updateInteraction(applicationId, token, `Error: ${e.message}`);
+                 await updateInteraction(applicationId, token, `Fehler: ${e.message}`);
              }
         })());
         return;
@@ -164,7 +159,7 @@ export default async function handler(req, res) {
         
         const userId = targetUserId || data.member?.user?.id || data.user?.id;
 
-        res.status(200).json({ type: 5 }); // Defer
+        res.status(200).json({ type: 5 });
         const { waitUntil } = await import("@vercel/functions");
         const { updateInteraction } = await import("../utils/discordApi.js");
         const { addLeagueAccount } = await import("../utils/db.js");
@@ -174,15 +169,15 @@ export default async function handler(req, res) {
              try {
                  const account = await getAccountByRiotId(gameName, tagLine);
                  if (!account) {
-                     await updateInteraction(applicationId, token, `Could not find Riot account for ${gameName}#${tagLine}.`);
+                     await updateInteraction(applicationId, token, `Kein Riot Account gefunden (EUW) ${gameName}#${tagLine}.`);
                      return;
                  }
                  
                  await addLeagueAccount(userId, account.puuid);
-                 await updateInteraction(applicationId, token, `Linked Riot account **${account.gameName}#${account.tagLine}** to <@${userId}>!`);
+                 await updateInteraction(applicationId, token, `Riot Account **${account.gameName}#${account.tagLine}** für <@${userId}> gesetzt!`);
              } catch (e) {
                  console.error(e);
-                 await updateInteraction(applicationId, token, `Error: ${e.message}`);
+                 await updateInteraction(applicationId, token, `Fehler: ${e.message}`);
              }
         })());
         return;
@@ -192,7 +187,7 @@ export default async function handler(req, res) {
         const targetUserId = data.data.options?.[0]?.value;
         const userId = targetUserId || data.member?.user?.id || data.user?.id;
         
-        res.status(200).json({ type: 5 }); // Defer
+        res.status(200).json({ type: 5 });
         const { waitUntil } = await import("@vercel/functions");
         const { updateInteraction } = await import("../utils/discordApi.js");
         const { removeLeagueAccount } = await import("../utils/db.js");
@@ -201,13 +196,13 @@ export default async function handler(req, res) {
              try {
                  await removeLeagueAccount(userId);
                  if (targetUserId) {
-                     await updateInteraction(applicationId, token, `Unlinked League account for <@${userId}>.`);
+                     await updateInteraction(applicationId, token, `Riot Account für <@${userId}> entfernt.`);
                  } else {
-                     await updateInteraction(applicationId, token, `Unlinked League account.`);
+                     await updateInteraction(applicationId, token, `Riot Account entfernt.`);
                  }
              } catch (e) {
                  console.error(e);
-                 await updateInteraction(applicationId, token, `Error: ${e.message}`);
+                 await updateInteraction(applicationId, token, `Fehler: ${e.message}`);
              }
         })());
         return;
@@ -217,7 +212,7 @@ export default async function handler(req, res) {
         const targetUserId = data.data.options?.[0]?.value;
         const userId = targetUserId || data.member?.user?.id || data.user?.id;
 
-        res.status(200).json({ type: 5 }); // Defer
+        res.status(200).json({ type: 5 });
         const { waitUntil } = await import("@vercel/functions");
         const { updateInteraction } = await import("../utils/discordApi.js");
         const { getLeagueAccount, getAllLeagueAccounts } = await import("../utils/db.js");
@@ -227,13 +222,13 @@ export default async function handler(req, res) {
              try {
                  const account = await getLeagueAccount(userId);
                  if (!account) {
-                     await updateInteraction(applicationId, token, `<@${userId}> has not linked a League account. Use \`/add-league-account\` to link one.`);
+                     await updateInteraction(applicationId, token, `<@${userId}> hat keinen Riot Account verlinkt. Nutze \`/add-league-account\` um einen hinzuzufügen.`);
                      return;
                  }
 
                  const riotAccount = await getAccountByPuuid(account.puuid);
                  if (!riotAccount) {
-                     await updateInteraction(applicationId, token, `Could not find Riot account data.`);
+                     await updateInteraction(applicationId, token, `Keine Daten gefunden.`);
                      return;
                  }
 
@@ -243,7 +238,6 @@ export default async function handler(req, res) {
                      title: `${riotAccount.gameName}#${riotAccount.tagLine}`,
                      url: dpmUrl,
                      fields: [],
-                     // thumbnail set below based on rank
                  };
                  
                  const queueType = command === "ranked" ? "RANKED_SOLO_5x5" : "RANKED_FLEX_SR";
@@ -265,10 +259,9 @@ export default async function handler(req, res) {
                      );
                  } else {
                      embed.description = `Unranked in ${command === "ranked" ? "Solo/Duo" : "Flex"}.`;
-                     embed.color = 0x99aab5; // Grey
+                     embed.color = 0x99aab5;
                  }
 
-                 // Process Match History
                  if (matchIds && matchIds.length > 0) {
                      const matchPromises = matchIds.map(id => getMatchDetails(id));
                      const matches = await Promise.all(matchPromises);
@@ -279,7 +272,7 @@ export default async function handler(req, res) {
                          const participant = match.info.participants.find(p => p.puuid === account.puuid);
                          if (!participant) continue;
                          
-                         const win = participant.win; // boolean
+                         const win = participant.win;
                          const champion = participant.championName;
                          const kda = `${participant.kills}/${participant.deaths}/${participant.assists}`;
                          
@@ -295,14 +288,14 @@ export default async function handler(req, res) {
 
              } catch (e) {
                  console.error(e);
-                 await updateInteraction(applicationId, token, `Error: ${e.message}`);
+                 await updateInteraction(applicationId, token, `Fehler: ${e.message}`);
              }
         })());
         return;
     }
 
     if (["ranked-race", "flex-race"].includes(command)) {
-        res.status(200).json({ type: 5 }); // Defer
+        res.status(200).json({ type: 5 });
         const { waitUntil } = await import("@vercel/functions");
         const { updateInteraction } = await import("../utils/discordApi.js");
         const { getAllLeagueAccounts } = await import("../utils/db.js");
@@ -312,13 +305,12 @@ export default async function handler(req, res) {
              try {
                  const accounts = await getAllLeagueAccounts();
                  if (!accounts || accounts.length === 0) {
-                     await updateInteraction(applicationId, token, "No users have linked their League accounts yet.");
+                     await updateInteraction(applicationId, token, "Keine Accounts verlinkt bisher.");
                      return;
                  }
 
                  const queueType = command === "ranked-race" ? "RANKED_SOLO_5x5" : "RANKED_FLEX_SR";
 
-                 // Fetch data for all users in parallel
                  const playerDataPromises = accounts.map(async (account) => {
                      try {
                          const [riotAccount, entries] = await Promise.all([
@@ -344,20 +336,19 @@ export default async function handler(req, res) {
                  const results = await Promise.all(playerDataPromises);
                  const validResults = results.filter(r => r !== null && r.entry !== null);
 
-                 // Sort Logic
                  const tierOrder = ["CHALLENGER", "GRANDMASTER", "MASTER", "DIAMOND", "EMERALD", "PLATINUM", "GOLD", "SILVER", "BRONZE", "IRON"];
                  const rankOrder = { "I": 1, "II": 2, "III": 3, "IV": 4 };
 
                  validResults.sort((a, b) => {
                      const tierA = tierOrder.indexOf(a.entry.tier);
                      const tierB = tierOrder.indexOf(b.entry.tier);
-                     if (tierA !== tierB) return tierA - tierB; // Lower index is better
+                     if (tierA !== tierB) return tierA - tierB;
 
                      const rankA = rankOrder[a.entry.rank];
                      const rankB = rankOrder[b.entry.rank];
-                     if (rankA !== rankB) return rankA - rankB; // Lower val (I=1) is better
+                     if (rankA !== rankB) return rankA - rankB;
 
-                     return b.entry.leaguePoints - a.entry.leaguePoints; // Higher LP is better
+                     return b.entry.leaguePoints - a.entry.leaguePoints;
                  });
 
                  const top10 = validResults.slice(0, 10);
@@ -379,14 +370,14 @@ export default async function handler(req, res) {
                  const embed = {
                      title: `${command === "ranked-race" ? "Solo/Duo" : "Flex"} Leaderboard`,
                      description: description,
-                     color: 0xf1c40f // Gold-ish
+                     color: 0xf1c40f
                  };
 
                  await updateInteraction(applicationId, token, "", undefined, undefined, [embed]);
 
              } catch (e) {
                  console.error(e);
-                 await updateInteraction(applicationId, token, `Error: ${e.message}`);
+                 await updateInteraction(applicationId, token, `Fehler: ${e.message}`);
              }
         })());
         return;
@@ -405,14 +396,14 @@ function getRankColor(tier) {
         "BRONZE": 0x8c523a,
         "SILVER": 0x80989d,
         "GOLD": 0xcdfafa, 
-        "PLATINUM": 0x25c6a5, // Teal
-        "EMERALD": 0x25c65f, // Green
-        "DIAMOND": 0x576bce, // Blue
-        "MASTER": 0x9d48e0, // Purple
-        "GRANDMASTER": 0xef4f4f, // Red
-        "CHALLENGER": 0xf4c874 // Gold/Yellowish
+        "PLATINUM": 0x25c6a5,
+        "EMERALD": 0x25c65f,
+        "DIAMOND": 0x576bce,
+        "MASTER": 0x9d48e0,
+        "GRANDMASTER": 0xef4f4f,
+        "CHALLENGER": 0xf4c874
     };
-    return colors[tier] || 0x0099ff; // Default Blue
+    return colors[tier] || 0x0099ff;
 }
 
     return res.status(200).json({
