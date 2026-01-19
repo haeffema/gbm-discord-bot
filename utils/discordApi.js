@@ -32,11 +32,10 @@ export async function updateInteraction(applicationId, token, content, fileBuffe
     if (!res.ok) {
         const text = await res.text();
         console.error("Discord API Error:", res.status, text);
-        throw new Error(`Discord API Error: ${res.status}`);
+        throw new Error(`Discord API Error: ${res.text}`);
     }
-    return true;
+    return;
   } catch (err) {
-    console.error("Failed to update interaction:", err);
-    return false;
+    await updateInteraction(applicationId, token, err);
   }
 }
