@@ -36,6 +36,7 @@ export async function updateInteraction(applicationId, token, content, fileBuffe
     }
     return;
   } catch (err) {
+    console.error(err);
     await updateInteraction(applicationId, token, err);
   }
 }
