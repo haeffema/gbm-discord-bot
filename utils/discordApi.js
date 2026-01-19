@@ -22,19 +22,15 @@ export async function updateInteraction(applicationId, token, content, fileBuffe
     headers["Content-Type"] = "application/json";
   }
 
-  try {
-    const res = await fetch(url, {
-      method: "PATCH",
-      headers,
-      body,
-    });
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers,
+    body,
+  });
 
-    if (!res.ok) {
-        const text = await res.text();
-        await updateInteraction(applicationId, token, "something broke, might be video size");
-        throw new Error(`Discord API Error: ${res.text}`);
-    }
-  } catch (err) {
-    console.error(err);
+  if (!res.ok) {
+      const text = await res.text();
+      await updateInteraction(applicationId, token, "something broke, might be video size");
+      console.error("Discord API Error:", res.status, text);
   }
 }
