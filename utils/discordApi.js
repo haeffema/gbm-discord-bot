@@ -30,7 +30,7 @@ export async function updateInteraction(applicationId, token, content, fileBuffe
 
   if (!res.ok) {
       const text = await res.text();
-      await updateInteraction(applicationId, token, "something broke, might be video size");
+      await updateInteraction(applicationId, token, `something broke: ${text.message}`);
       console.error("Discord API Error:", res.status, text);
   }
 }
