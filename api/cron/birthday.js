@@ -6,8 +6,8 @@ export default async function handler(req, res) {
   const channelId = process.env.BIRTHDAY_CHANNEL_ID;
 
   if (!channelId) {
-      console.error("BIRTHDAY_CHANNEL_ID not set");
-      return res.status(500).json({ error: "Configuration error" });
+    console.error("BIRTHDAY_CHANNEL_ID not set");
+    return res.status(500).json({ error: "Configuration error" });
   }
 
   const now = new Date().toLocaleString("en-US", { timeZone: "Europe/Berlin" });
@@ -17,36 +17,32 @@ export default async function handler(req, res) {
   const currentYear = dateObj.getFullYear();
 
   try {
-      const users = await getBirthdays(day, month);
-      
-      if (users.length > 0) {
-          const lines = users.map(u => {
-              const age = u.year ? currentYear - u.year : null;
-              if (age) {
-                  return `Alles Gute zum ${age}. Geburtstag, <@${u.user_id}>! 🥳`;
-              } else {
-                  return `Alles Gute zum Geburtstag, <@${u.user_id}>! 🥳`;
-              }
-          });
-          
-          const content = `🎉 **Geburtstage Heute!** 🎂\n${lines.join("\n")}`;
+    const users = await getBirthdays(day, month);
 
-          await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bot ${token}`
-              },
-              body: JSON.stringify({ content })
-          });
-          console.log(`Sent birthday message to ${users.length} users.`);
-      } else {
-          console.log("No birthdays today.");
+    if (users.length > 0) {
+      for (const user of users) {
+        const age = user.year ? currentYear - user.year : null;
+        const content = `${age ? `Alles Gute zum ${age}. Geburtstag, <@${user.user_id}>! 🥳` : `Alles Gute zum Geburtstag, <@${user.user_id}>! 🥳`}`;
+        await fetch(
+          `https://discord.com/api/v10/channels/${channelId}/messages`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bot ${token}`,
+            },
+            body: JSON.stringify({ content }),
+          },
+        );
       }
-      
-      res.status(200).json({ success: true, count: users.length });
+      console.log(`Sent birthday message to ${users.length} users.`);
+    } else {
+      console.log("No birthdays today.");
+    }
+
+    res.status(200).json({ success: true, count: users.length });
   } catch (error) {
-      console.error("Cron error:", error);
-      res.status(500).json({ error: error.message });
+    console.error("Cron error:", error);
+    res.status(500).json({ error: error.message });
   }
 }
